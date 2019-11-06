@@ -40,7 +40,7 @@ static const char kNotInvertibleScalarMsg[] =
     "The matrix is not invertible: it is a scalar with value zero.";
 
 template <typename Scalar>
-__global__ void SolveForSizeOneOrTwoKernel(const int m,
+__device__ void SolveForSizeOneOrTwoKernel(const int m,
                                            const Scalar* __restrict__ diags,
                                            const Scalar* __restrict__ rhs,
                                            const int num_rhs,

@@ -57,7 +57,7 @@ using gpuError_t = hipError_t;
 #if GOOGLE_CUDA
 
 #define GPU_DYNAMIC_SHARED_MEM_DECL(ALIGN, TYPE, NAME) \
-  extern __shared__ __align__(ALIGN) TYPE NAME[]
+  extern __shared__ TYPE NAME[]
 
 #elif TENSORFLOW_USE_ROCM
 

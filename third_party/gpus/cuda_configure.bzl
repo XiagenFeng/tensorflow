@@ -561,15 +561,21 @@ def find_lib(repository_ctx, paths, check_soname = True):
       Returns:
         Returns the first path in paths that exist.
     """
+    # Mac OS can not use objdump to check_so, just disable it
+    check_soname = False
     objdump = repository_ctx.which("objdump")
     mismatches = []
     for path in [repository_ctx.path(path) for path in paths]:
         if not path.exists:
             continue
         if check_soname and objdump != None and not _is_windows(repository_ctx):
+            #output = repository_ctx.execute([objdump, "-p", str(path)]).stdout
+            #output = [line for line in output.splitlines() if "SONAME" in line]
+            #sonames = [line.strip().split(" ")[-1] for line in output]
             output = repository_ctx.execute([objdump, "-p", str(path)]).stdout
-            output = [line for line in output.splitlines() if "SONAME" in line]
-            sonames = [line.strip().split(" ")[-1] for line in output]
+            output = [line for line in output.splitlines() if "name @rpath/" in line]
+            sonames = [line.strip().split("/")[-1] for line in output]
+            sonames = [sonames[0].strip().split(" ")[0] for line in output]
             if not any([soname == path.basename for soname in sonames]):
                 mismatches.append(str(path))
                 continue
@@ -618,7 +624,7 @@ def _find_libs(repository_ctx, cuda_config):
         Map of library names to structs of filename and path.
       """
     cpu_value = cuda_config.cpu_value
-    stub_dir = "" if _is_windows(repository_ctx) else "/stubs"
+    stub_dir = "" if _is_windows(repository_ctx) else ""
     return {
         "cuda": _find_cuda_lib(
             "cuda",
@@ -947,7 +953,7 @@ def make_copy_dir_rule(repository_ctx, name, src_dir, out_dir):
     outs = [
 %s
     ],
-    cmd = \"""cp -rLf "%s/." "%s/" \""",
+    cmd = \"""cp -r -f "%s/." "%s/" \""",
 )""" % (name, "\n".join(outs), src_dir, out_dir)
 
 def _read_dir(repository_ctx, src_dir):

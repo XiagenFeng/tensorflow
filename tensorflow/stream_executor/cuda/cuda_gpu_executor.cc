@@ -195,7 +195,7 @@ static string GetBinaryDir(bool strip_exe) {
   _NSGetExecutablePath(nullptr, &buffer_size);
   char unresolved_path[buffer_size];
   _NSGetExecutablePath(unresolved_path, &buffer_size);
-  CHECK_ERR(realpath(unresolved_path, exe_path) ? 1 : -1);
+ // CHECK_ERR(realpath(unresolved_path, exe_path) ? 1 : -1);
 #else
 #if defined(PLATFORM_WINDOWS)
   HMODULE hModule = GetModuleHandle(NULL);
